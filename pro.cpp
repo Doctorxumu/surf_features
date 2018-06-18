@@ -5,6 +5,8 @@
 #include<opencv2/imgproc.hpp>
 
 void draw_rectangle(cv::Mat,int,int,int,int);
+cv::Mat crop_image(cv::Mat,int,int,int,int);
+
 
 int main(int argc,char** argv){
 	cv::Mat img_1;
@@ -28,6 +30,10 @@ int main(int argc,char** argv){
 	cv::namedWindow("img_2",cv::WINDOW_AUTOSIZE);
 	cv::imshow("img_2",img_2);
 
+	cv::Mat croppedImage=crop_image(img_1,134,55,60,88);
+	cv::namedWindow("image1_crop",cv::WINDOW_AUTOSIZE);
+	cv::imshow("image1_crop",croppedImage);
+
 	cv::waitKey(0);
 	return 0;
 }
@@ -39,5 +45,10 @@ void draw_rectangle(cv::Mat img,int x, int y,int width,int height){
 
 }
 
+cv::Mat crop_image(cv::Mat img,int x,int y,int width,int height){
+	cv::Rect RectForImg=cv::Rect(x,y,width,height);
+	cv::Mat croppedImage=img(RectForImg);
+	return croppedImage;
 
+}
 
