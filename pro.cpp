@@ -3,12 +3,17 @@
 #include<opencv2/imgcodecs.hpp>
 #include<iostream>
 #include<opencv2/imgproc.hpp>
-
+#include "opencv2/features2d.hpp"
+#include "opencv2/xfeatures2d.hpp"
+#include <fstream>
 using namespace cv;
+using namespace cv::xfeatures2d;
+using namespace std;
 
 void draw_rectangle(Mat,int,int,int,int);
 cv::Mat crop_image(Mat,int,int,int,int);
 void display_image(const char *,Mat);
+void vector_to_csv(vector<KeyPoint>,const char *);
 
 int main(int argc,char** argv){
 	Mat img_1;
@@ -34,6 +39,16 @@ int main(int argc,char** argv){
 
 
 	display_image("image1_crop",image1_crop);
+
+	int minHessian=400;
+	Ptr<SURF> detector = SURF::create(minHessian);
+
+	std::vector<KeyPoint> keypoints_1,keypoints_2;
+	detector->detect(img_1,keypoints_1);
+	detector->detect(img_2,keypoints_2);
+	
+	vector_to_csv(keypoints_1,"features0001.csv");
+	vector_to_csv(keypoints_2,"features0199.csv");
 	waitKey(0);
 	return 0;
 }
@@ -57,3 +72,14 @@ Mat crop_image(Mat img,int x,int y,int width,int height){
 
 }
 
+void vector_to_csv(vector<KeyPoint> keypoints,const char * filename){
+	ofstream features;
+        features.open(filename);
+
+        for(int n=0;n<keypoints.size();n++){
+                features << keypoints[n].pt.x << "," << keypoints[n].pt.y  << endl;
+        }       
+
+        features.close();
+
+}
