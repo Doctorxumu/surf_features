@@ -21,6 +21,7 @@ int main(int argc,char** argv){
 	Mat img_1;
 	Mat img_2;
 
+	// -- step 3 - load the images
 	img_1 = imread("Fish/img/0001.jpg");
 	img_2 = imread("Fish/img/0199.jpg");
 
@@ -33,10 +34,12 @@ int main(int argc,char** argv){
 	display_image("img_1",img_1);
 	display_image("img_2",img_2);
 
+	// step 4 - draw rectangle and crop the image
 	Mat image1_crop=crop_image(img_1,134,55,60,88);
 	draw_rectangle(img_1,134,55,60,88);
 	display_image("image1_crop",image1_crop);
 
+	// -- step 5 - keypoint calculate and write to csv
 	int minHessian=400;
 	Ptr<SURF> detector = SURF::create();
 	detector->setHessianThreshold(minHessian);
@@ -49,7 +52,7 @@ int main(int argc,char** argv){
 	vector_to_csv(keypoints_1,"features0001.csv");
 	vector_to_csv(keypoints_2,"features0199.csv");
 
-	//-- step 6
+	//-- step 6 - create feature vector
 
 	Ptr<SURF>  extractor = SURF::create();
 	Mat descriptors_1,descriptors_2,descriptors_1_crop;
