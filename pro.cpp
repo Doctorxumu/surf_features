@@ -14,6 +14,7 @@ void draw_rectangle(Mat,int,int,int,int);
 cv::Mat crop_image(Mat,int,int,int,int);
 void display_image(const char *,Mat);
 void vector_to_csv(vector<KeyPoint>,const char *);
+vector<DMatch> image_matcher(Mat&,Mat&);
 
 int main(int argc,char** argv){
 	Mat img_1;
@@ -39,9 +40,10 @@ int main(int argc,char** argv){
 	Ptr<SURF> detector = SURF::create();
 	detector->setHessianThreshold(minHessian);
 
-	std::vector<KeyPoint> keypoints_1,keypoints_2;
+	std::vector<KeyPoint> keypoints_1,keypoints_2,keypoints_1_crop;
 	detector->detect(img_1,keypoints_1);
 	detector->detect(img_2,keypoints_2);
+	detector->detect(image1_crop,keypoints_1_crop);
 	
 	vector_to_csv(keypoints_1,"features0001.csv");
 	vector_to_csv(keypoints_2,"features0199.csv");
@@ -49,22 +51,31 @@ int main(int argc,char** argv){
 	//-- step 6
 
 	Ptr<SURF>  extractor = SURF::create();
-	Mat descriptors_1,descriptors_2;
+	Mat descriptors_1,descriptors_2,descriptors_1_crop;
 	extractor->compute(img_1,keypoints_1,descriptors_1);
 	extractor->compute(img_2,keypoints_2,descriptors_2);
+	extractor->compute(image1_crop,keypoints_1_crop,descriptors_1_crop);
 
 	// -- step 7 - matching 2 images with brute force matcher
-        BFMatcher matcher(NORM_L2);
-        vector<DMatch> matches;
-        matcher.match(descriptors_1,descriptors_2,matches);
-	
-	// -- step 8	
+        vector<DMatch> matches_1_and_2=image_matcher(descriptors_1,descriptors_2);
+	vector<DMatch> matches_1_and_1crop=image_matcher(descriptors_1,descriptors_1_crop);
+	vector<DMatch> matches_1crop_and_2=image_matcher(descriptors_1_crop,descriptors_2);
+
+	// -- step 8
 	Mat img_matches;
-	drawMatches(img_1,keypoints_1,img_2,keypoints_2,matches,img_matches);
+	drawMatches(img_1,keypoints_1,img_2,keypoints_2,matches_1_and_2,img_matches);
 	imshow("Matches of img_1 and img_2",img_matches);
-	
+
 	waitKey(0);
 	return 0;
+}
+
+vector<DMatch> image_matcher(Mat& descriptors_1,Mat& descriptors_2){
+	BFMatcher matcher(NORM_L2);
+        vector<DMatch> matches;
+        matcher.match(descriptors_1,descriptors_2,matches);
+	return matches;
+
 }
 
 void display_image(const char * name,Mat img){
