@@ -15,6 +15,7 @@ cv::Mat crop_image(Mat,int,int,int,int);
 void display_image(const char *,Mat);
 void vector_to_csv(vector<KeyPoint>,const char *);
 vector<DMatch> image_matcher(Mat&,Mat&);
+void draw_image_matches(Mat&,vector<KeyPoint>&,Mat&,vector<KeyPoint>&,vector<DMatch>&,const char *);
 
 int main(int argc,char** argv){
 	Mat img_1;
@@ -44,7 +45,7 @@ int main(int argc,char** argv){
 	detector->detect(img_1,keypoints_1);
 	detector->detect(img_2,keypoints_2);
 	detector->detect(image1_crop,keypoints_1_crop);
-	
+
 	vector_to_csv(keypoints_1,"features0001.csv");
 	vector_to_csv(keypoints_2,"features0199.csv");
 
@@ -58,16 +59,22 @@ int main(int argc,char** argv){
 
 	// -- step 7 - matching 2 images with brute force matcher
         vector<DMatch> matches_1_and_2=image_matcher(descriptors_1,descriptors_2);
-	vector<DMatch> matches_1_and_1crop=image_matcher(descriptors_1,descriptors_1_crop);
+	vector<DMatch> matches_1_and_1crop=image_matcher(descriptors_1_crop,descriptors_1);
 	vector<DMatch> matches_1crop_and_2=image_matcher(descriptors_1_crop,descriptors_2);
 
-	// -- step 8
-	Mat img_matches;
-	drawMatches(img_1,keypoints_1,img_2,keypoints_2,matches_1_and_2,img_matches);
-	imshow("Matches of img_1 and img_2",img_matches);
+	// -- step 8 - draw lines indicating matcher
+	draw_image_matches(img_1,keypoints_1,img_2,keypoints_2,matches_1_and_2,"output/Matches_of_imag_1_and_img_2.jpg");
+	draw_image_matches(image1_crop,keypoints_1_crop,img_1,keypoints_1,matches_1_and_1crop,"output/output_matching.jpg");
+//	draw_image_matches(image1_crop,keypoints_1_crop,img_2,keypoints_2,matches_1crop_and_2);
 
 	waitKey(0);
 	return 0;
+}
+
+void draw_image_matches(Mat& img_1,vector<KeyPoint>& keypoints_1,Mat& img_2,vector<KeyPoint>& keypoints_2,vector<DMatch>& matches,const char * image_name){
+	Mat img_matches;
+        drawMatches(img_1,keypoints_1,img_2,keypoints_2,matches,img_matches);
+        imwrite(image_name,img_matches);
 }
 
 vector<DMatch> image_matcher(Mat& descriptors_1,Mat& descriptors_2){
@@ -103,7 +110,7 @@ void vector_to_csv(vector<KeyPoint> keypoints,const char * filename){
 
         for(int n=0;n<keypoints.size();n++){
                 features << keypoints[n].pt.x << "," << keypoints[n].pt.y  << endl;
-        }       
+        }
 
         features.close();
 
