@@ -36,7 +36,8 @@ int main(int argc,char** argv){
 	display_image("image1_crop",image1_crop);
 
 	int minHessian=400;
-	Ptr<SURF> detector = SURF::create(minHessian);
+	Ptr<SURF> detector = SURF::create();
+	detector->setHessianThreshold(minHessian);
 
 	std::vector<KeyPoint> keypoints_1,keypoints_2;
 	detector->detect(img_1,keypoints_1);
@@ -46,10 +47,22 @@ int main(int argc,char** argv){
 	vector_to_csv(keypoints_2,"features0199.csv");
 
 	//-- step 6
+
 	Ptr<SURF>  extractor = SURF::create();
 	Mat descriptors_1,descriptors_2;
 	extractor->compute(img_1,keypoints_1,descriptors_1);
+	extractor->compute(img_2,keypoints_2,descriptors_2);
 
+	// -- step 7 - matching 2 images with brute force matcher
+        BFMatcher matcher(NORM_L2);
+        vector<DMatch> matches;
+        matcher.match(descriptors_1,descriptors_2,matches);
+	
+	// -- step 8	
+	Mat img_matches;
+	drawMatches(img_1,keypoints_1,img_2,keypoints_2,matches,img_matches);
+	imshow("Matches of img_1 and img_2",img_matches);
+	
 	waitKey(0);
 	return 0;
 }
