@@ -81,7 +81,8 @@ void draw_image_matches(Mat& img_1,vector<KeyPoint>& keypoints_1,Mat& img_2,vect
 }
 
 vector<DMatch> image_matcher(Mat& descriptors_1,Mat& descriptors_2){
-	BFMatcher matcher(NORM_L2);
+	//BFMatcher matcher(NORM_L2);
+	FlannBasedMatcher matcher;
         vector<DMatch> matches;
         matcher.match(descriptors_1,descriptors_2,matches);
 	return matches;
