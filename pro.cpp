@@ -22,8 +22,8 @@ int main(int argc,char** argv){
 	Mat img_2;
 
 	// -- step 3 - load the images
-	img_1 = imread("Fish/img/0001.jpg");
-	img_2 = imread("Fish/img/0199.jpg");
+	img_1 = imread("Fish/img/0001.jpg",IMREAD_GRAYSCALE);
+	img_2 = imread("Fish/img/0199.jpg",IMREAD_GRAYSCALE);
 
 	if((! img_1.data) || (! img_2.data)){
 		std::cout << "image not found" << std::endl;
@@ -51,7 +51,7 @@ int main(int argc,char** argv){
 
 	vector_to_csv(keypoints_1,"features0001.csv");
 	vector_to_csv(keypoints_2,"features0199.csv");
-
+	vector_to_csv(keypoints_1_crop,"features0001_crop.csv");
 	//-- step 6 - create feature vector
 
 	Ptr<SURF>  extractor = SURF::create();
