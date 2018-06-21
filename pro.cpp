@@ -26,18 +26,13 @@ int main(int argc,char** argv){
 		std::cout << "image not found" << std::endl;
 		return -1;
 	}
-	
-	
+
 
 	display_image("img_1",img_1);
-
-
 	display_image("img_2",img_2);
 
 	Mat image1_crop=crop_image(img_1,134,55,60,88);
 	draw_rectangle(img_1,134,55,60,88);
-
-
 	display_image("image1_crop",image1_crop);
 
 	int minHessian=400;
@@ -49,6 +44,12 @@ int main(int argc,char** argv){
 	
 	vector_to_csv(keypoints_1,"features0001.csv");
 	vector_to_csv(keypoints_2,"features0199.csv");
+
+	//-- step 6
+	Ptr<SURF>  extractor = SURF::create();
+	Mat descriptors_1,descriptors_2;
+	extractor->compute(img_1,keypoints_1,descriptors_1);
+
 	waitKey(0);
 	return 0;
 }
@@ -83,3 +84,5 @@ void vector_to_csv(vector<KeyPoint> keypoints,const char * filename){
         features.close();
 
 }
+
+
